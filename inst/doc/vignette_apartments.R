@@ -31,7 +31,8 @@ plot(profiles) + show_observations(profiles)
 
 ## ---- warning = FALSE, error = FALSE, message = FALSE, include = TRUE----
 library("vivo")
-measure <- local_variable_importance(profiles, apartments[,2:5], absolute_deviation = TRUE, point = TRUE, density = TRUE)
+measure <- local_variable_importance(profiles, apartments[,2:5], 
+            absolute_deviation = TRUE, point = TRUE, density = TRUE)
 
 ## ---- warning = FALSE, error = FALSE, message = FALSE, include = TRUE----
 plot(measure)
