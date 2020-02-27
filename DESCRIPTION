@@ -1,7 +1,7 @@
 Package: vivo
 Title: Local Variable Importance via Oscillations of Ceteris Paribus
         Profiles
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(person("Anna", "Kozak", email = "anna1993kozak@gmail.com", role = c("aut", "cre")),
             person("Przemyslaw", "Biecek", role = c("aut", "ths")))
 Description: Provides an easy to calculate variable importance measure based on 
@@ -20,9 +20,9 @@ RoxygenNote: 6.1.1
 URL: https://github.com/ModelOriented/vivo
 BugReports: https://github.com/ModelOriented/vivo/issues
 NeedsCompilation: no
-Packaged: 2019-09-03 16:53:07 UTC; Anna Kozak
+Packaged: 2020-02-27 12:42:24 UTC; Anna Kozak
 Author: Anna Kozak [aut, cre],
   Przemyslaw Biecek [aut, ths]
 Maintainer: Anna Kozak <anna1993kozak@gmail.com>
 Repository: CRAN
-Date/Publication: 2019-09-03 17:20:03 UTC
+Date/Publication: 2020-02-27 13:40:02 UTC
