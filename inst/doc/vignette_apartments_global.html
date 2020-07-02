@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Anna Kozak" />
+
+<meta name="date" content="2020-07-02" />
+
+<title>Example of global variable importance</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Example of global variable importance</h1>
+<h4 class="author">Anna Kozak</h4>
+<h4 class="date">2020-07-02</h4>
+
+
+
+<div id="example-of-global-variable-importance" class="section level2">
+<h2>Example of global variable importance</h2>
+<p>In this vignette, we present a global variable importance measure based on Partial Dependence Profiles (PDP) for the random forest regression model.</p>
+<div id="dataset" class="section level3">
+<h3>1 Dataset</h3>
+<p>We work on Apartments dataset from <code>DALEX</code> package.</p>
+<pre><code>#&gt;   m2.price construction.year surface floor no.rooms    district
+#&gt; 1     5897              1953      25     3        1 Srodmiescie
+#&gt; 2     1818              1992     143     9        5     Bielany
+#&gt; 3     3643              1937      56     1        2       Praga
+#&gt; 4     3517              1995      93     7        3      Ochota
+#&gt; 5     3013              1992     144     6        5     Mokotow
+#&gt; 6     5795              1926      61     6        2 Srodmiescie</code></pre>
+</div>
+<div id="random-forest-regression-model" class="section level3">
+<h3>2 Random forest regression model</h3>
+<p>Now, we define a random forest regression model and use <code>explain()</code> function from <code>DALEX</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(<span class="st">&quot;randomForest&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>apartments_rf_model &lt;-<span class="st"> </span><span class="kw">randomForest</span>(m2.price <span class="op">~</span><span class="st"> </span>construction.year <span class="op">+</span><span class="st"> </span>surface <span class="op">+</span><span class="st"> </span>floor <span class="op">+</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="st">                                      </span>no.rooms, <span class="dt">data =</span> apartments)</span>
+<span id="cb2-4"><a href="#cb2-4"></a>explainer_rf &lt;-<span class="st"> </span><span class="kw">explain</span>(apartments_rf_model,</span>
+<span id="cb2-5"><a href="#cb2-5"></a>                        <span class="dt">data =</span> apartmentsTest[,<span class="dv">2</span><span class="op">:</span><span class="dv">5</span>], <span class="dt">y =</span> apartmentsTest<span class="op">$</span>m2.price)</span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt; Preparation of a new explainer is initiated</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt;   -&gt; model label       :  randomForest  ( [33m default [39m )</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt;   -&gt; data              :  9000  rows  4  cols </span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt;   -&gt; target variable   :  9000  values </span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt;   -&gt; predict function  :  yhat.randomForest  will be used ( [33m default [39m )</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt;   -&gt; predicted values  :  numerical, min =  2125.441 , mean =  3514.379 , max =  5326.192  </span></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt;   -&gt; model_info        :  package randomForest , ver. 4.6.14 , task regression ( [33m default [39m ) </span></span>
+<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt;   -&gt; residual function :  difference between y and yhat ( [33m default [39m )</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt;   -&gt; residuals         :  numerical, min =  -1225.81 , mean =  -2.855209 , max =  2162.728  </span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt;  [32m A new explainer has been created! [39m</span></span></code></pre></div>
+</div>
+<div id="calculate-partial-dependence-profiles" class="section level3">
+<h3>3 Calculate Partial Dependence Profiles</h3>
+<p>Let see the Partial Dependence Profiles calculated with <code>DALEX::model_profile()</code> function. The PDP also can be calculated with <code>DALEX::variable_profile()</code> or <code>ingredients::partial_dependence()</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>profiles &lt;-<span class="st"> </span><span class="kw">model_profile</span>(explainer_rf)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">plot</span>(profiles) </span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="calculate-measure-of-global-variable-importance" class="section level3">
+<h3>4 Calculate measure of global variable importance</h3>
+<p>Now, we calculated a measure of global variable importance via oscillation based on PDP.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">library</span>(<span class="st">&quot;vivo&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>measure &lt;-<span class="st"> </span><span class="kw">global_variable_importance</span>(profiles)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">plot</span>(measure)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>The most important variable is surface, then no.rooms, floor, and construction.year.</p>
+</div>
+<div id="comparison-of-the-importance-of-variables-for-two-or-more-models" class="section level3">
+<h3>5 Comparison of the importance of variables for two or more models</h3>
+<p>Let created a linear regression model and <code>explain</code> object.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>apartments_lm_model &lt;-<span class="st"> </span><span class="kw">lm</span>(m2.price <span class="op">~</span><span class="st"> </span>construction.year <span class="op">+</span><span class="st"> </span>surface <span class="op">+</span><span class="st"> </span>floor <span class="op">+</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="st">                                      </span>no.rooms, <span class="dt">data =</span> apartments)</span>
+<span id="cb6-3"><a href="#cb6-3"></a>explainer_lm &lt;-<span class="st"> </span><span class="kw">explain</span>(apartments_lm_model,</span>
+<span id="cb6-4"><a href="#cb6-4"></a>                        <span class="dt">data =</span> apartmentsTest[,<span class="dv">2</span><span class="op">:</span><span class="dv">5</span>], <span class="dt">y =</span> apartmentsTest<span class="op">$</span>m2.price)</span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; Preparation of a new explainer is initiated</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt;   -&gt; model label       :  lm  ( [33m default [39m )</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt;   -&gt; data              :  9000  rows  4  cols </span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt;   -&gt; target variable   :  9000  values </span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt;   -&gt; predict function  :  yhat.lm  will be used ( [33m default [39m )</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt;   -&gt; predicted values  :  numerical, min =  2231.8 , mean =  3507.346 , max =  4769.053  </span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt;   -&gt; model_info        :  package stats , ver. 3.6.3 , task regression ( [33m default [39m ) </span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;   -&gt; residual function :  difference between y and yhat ( [33m default [39m )</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt;   -&gt; residuals         :  numerical, min =  -733.2516 , mean =  4.177813 , max =  2107.979  </span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt;  [32m A new explainer has been created! [39m</span></span></code></pre></div>
+<p>We calculated Partial Dependence Profiles and measure.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>profiles_lm &lt;-<span class="st"> </span><span class="kw">model_profile</span>(explainer_lm)</span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a>measure_lm &lt;-<span class="st"> </span><span class="kw">global_variable_importance</span>(profiles_lm)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">plot</span>(measure_lm, measure, <span class="dt">type =</span> <span class="st">&quot;lines&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Now we can see the order of importance of variables by model.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
